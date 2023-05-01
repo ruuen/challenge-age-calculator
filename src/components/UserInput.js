@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { DateTime } from "luxon";
 import submitIcon from "../media/icon-arrow.svg";
 
 export default function UserInput({ handleAgeChange }) {
@@ -22,26 +23,37 @@ export default function UserInput({ handleAgeChange }) {
   function handleSubmit(e) {
     e.preventDefault();
 
-    // TODO:
-    // Implement proper validation actions when styling is sorted out
-    if (birthday.day == "" || birthday.month == "" || birthday.year == "") {
-      console.log("Field empty");
+    // TODO: add error handling functionality & remove alert placeholders
+    if (birthday.day === "" || birthday.month === "" || birthday.year === "") {
+      alert("Field empty");
       return;
     }
 
     if (birthday.day < 1 || birthday.day > 31) {
-      console.log("Day out of range");
+      alert("Day out of range");
       return;
     }
 
     if (birthday.month < 1 || birthday.month > 12) {
-      console.log("Month out of range");
+      alert("Month out of range");
       return;
     }
-    // TODO:
-    // Improve this validation to only reject years if the date is in future
-    if (birthday.year < 1900 || birthday.year > 2023) {
-      console.log("Year out of range");
+
+    if (birthday.year < 1900) {
+      alert("Year out of range");
+      return;
+    }
+
+    let date;
+    try {
+      date = DateTime.fromObject({ year: birthday.year, month: birthday.month, day: birthday.day });
+    } catch (error) {
+      alert("Invalid date");
+      return;
+    }
+
+    if (date > DateTime.now()) {
+      alert("Date in future");
       return;
     }
 
@@ -59,7 +71,7 @@ export default function UserInput({ handleAgeChange }) {
           name="day"
           placeholder="DD"
           className="inputs__input inputs__day"
-          value={birthday.day}
+          value={birthday.day == null ? "" : birthday.day}
           onChange={handleChange}
         />
         <label htmlFor="month" className="inputs__input-label">
@@ -70,7 +82,7 @@ export default function UserInput({ handleAgeChange }) {
           name="month"
           placeholder="MM"
           className="inputs__input inputs__month"
-          value={birthday.month}
+          value={birthday.month == null ? "" : birthday.month}
           onChange={handleChange}
         />
         <label htmlFor="year" className="inputs__input-label">
@@ -81,7 +93,7 @@ export default function UserInput({ handleAgeChange }) {
           name="year"
           placeholder="YYYY"
           className="inputs__input inputs__year"
-          value={birthday.year}
+          value={birthday.year == null ? "" : birthday.year}
           onChange={handleChange}
         />
       </div>

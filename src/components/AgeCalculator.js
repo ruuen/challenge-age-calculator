@@ -1,23 +1,26 @@
 import { useState } from "react";
+import { DateTime, Settings } from "luxon";
 import DateDisplay from "./DateDisplay";
 import UserInput from "./UserInput";
 
 export default function AgeCalculator() {
+  // Luxon setting to throw exceptions when a datetime is created as invalid
+  Settings.throwOnInvalid = true;
+
   const [age, setAge] = useState({
-    day: null,
-    month: null,
-    year: null,
+    days: null,
+    months: null,
+    years: null,
   });
 
-  function handleAgeChange({ day, month, year }) {
-    // TODO:
-    // Call calc and store result as age state
-    console.log(birthDate);
-  }
+  function handleAgeChange({ year, month, day }) {
+    const birthDate = DateTime.fromObject({ year: year, month: month, day: day });
+    const ageCalc = DateTime.now().diff(birthDate, ["years", "months", "days"]).toObject();
 
-  function calculateAge() {
-    // TODO:
-    // Implement this calc
+    setAge({
+      ...ageCalc,
+      days: Math.floor(ageCalc.days),
+    });
   }
 
   return (
