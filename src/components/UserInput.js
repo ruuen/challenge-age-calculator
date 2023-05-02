@@ -4,27 +4,60 @@ import submitIcon from "../media/icon-arrow.svg";
 import InputItem from "./InputItem";
 
 export default function UserInput({ handleAgeChange }) {
-  const [birthday, setBirthday] = useState({
-    day: null,
-    month: null,
-    year: null,
-  });
+  const [birthday, setBirthday] = useState([
+    {
+      field: "day",
+      value: null,
+      hasError: false,
+      errorMsg: null,
+    },
+    {
+      field: "month",
+      value: null,
+      hasError: false,
+      errorMsg: null,
+    },
+    {
+      field: "year",
+      value: null,
+      hasError: false,
+      errorMsg: null,
+    },
+  ]);
 
-  const [formError, setFormError] = useState({
-    hasError: false,
-    details: [],
-  });
-
-  const inputElements = Object.keys(birthday).map((item, index) => {
-    return <InputItem key={index} name={item} value={birthday[item]} handleChange={handleChange} />;
+  const inputElements = birthday.map((field, index) => {
+    return (
+      <InputItem
+        key={index}
+        name={field.field}
+        value={field.value}
+        errorStatus={field.hasError}
+        errorMessage={field.errorMsg}
+        handleChange={handleChange}
+      />
+    );
   });
 
   function handleChange(e) {
-    setBirthday((prevState) => {
-      return {
-        ...prevState,
-        [e.target.name]: e.target.value,
-      };
+    setBirthday((prevBirthdayFields) => {
+      const predicate = (fieldObj) => fieldObj.field === e.target.name;
+
+      return prevBirthdayFields.toSpliced(prevBirthdayFields.findIndex(predicate), 1, {
+        ...prevBirthdayFields.find(predicate),
+        value: e.target.value,
+      });
+    });
+  }
+
+  function handleClearError() {
+    setBirthday((prevBirthdayFields) => {
+      return prevBirthdayFields.map((fieldObj) => {
+        return {
+          ...fieldObj,
+          hasError: false,
+          errorMsg: null,
+        };
+      });
     });
   }
 
@@ -32,128 +65,105 @@ export default function UserInput({ handleAgeChange }) {
     e.preventDefault();
 
     // Validate birthday value inputs against specified rules
-    // Return a state object determing if form valid/invalid, and list of errors
+    // Return a new array of birthday fields, updated with any validation errors
     const formState = validateFormInputs(birthday);
 
-    // If form valid, update the component form error state and call the age state update
-    if (!formState.hasError) {
-      setFormError(formState);
-      handleAgeChange(birthday);
+    // If any field errors exist, update birthday field list state
+    if (formState.find((fieldObj) => fieldObj.hasError === true)) {
+      setBirthday(formState);
       return;
     }
 
-    // If form invalid, update the component form error state
-    setFormError(formState);
+    // If no errors, pass birthdate into a date obj in the age calc fn call, then clear all input errors.
+    handleAgeChange({
+      year: formState.find((field) => field.field === "year").value,
+      month: formState.find((field) => field.field === "month").value,
+      day: formState.find((field) => field.field === "day").value,
+    });
+    handleClearError();
   }
 
   function validateFormInputs(birthday) {
-    // Initialise an object with a valid form state
-    // This is modified/replaced throughout and gets returned on each logic path
-    let formState = {
-      hasError: false,
-      details: [],
-    };
+    // Copy the passed field state array
+    let formState = Array.from(birthday);
 
-    // Initialise an array of arrays containing each field name and value for comparison
-    const fieldData = Object.entries(birthday);
+    // Loop through the state array to perform field validations
+    formState = formState.map((fieldObj) => {
+      const { field, value } = fieldObj;
 
-    // Perform individual field value checks here
-    fieldData.forEach((field) => {
-      const fieldName = field[0];
-      const value = field[1];
-
-      // Check if field empty
+      // Don't allow any null or empty value fields
       if (value === "" || value === null) {
-        formState.details.push({
-          field: fieldName,
-          message: "This field is required",
-        });
-        return;
+        return {
+          ...fieldObj,
+          hasError: true,
+          errorMsg: "This field is required",
+        };
       }
 
-      // Check if field values within correct number range
-      switch (fieldName) {
-        case "day":
-          if (value < 1 || value > 31) {
-            formState.details.push({
-              field: fieldName,
-              message: "Must be a valid day",
-            });
-          }
-          return;
-        case "month":
-          if (value < 1 || value > 12) {
-            formState.details.push({
-              field: fieldName,
-              message: "Must be a valid month",
-            });
-          }
-          return;
-        case "year":
-          if (value < 1900) {
-            formState.details.push({
-              field: fieldName,
-              message: "Must be after 1900",
-            });
-          }
-          return;
-        default:
-          break;
+      if (field === "day" && (value < 1 || value > 31)) {
+        return {
+          ...fieldObj,
+          hasError: true,
+          errorMsg: "Must be a valid day",
+        };
       }
+
+      if (field === "month" && (value < 1 || value > 12)) {
+        return {
+          ...fieldObj,
+          hasError: true,
+          errorMsg: "Must be a valid month",
+        };
+      }
+
+      if (field === "year" && value < 1900) {
+        return {
+          ...fieldObj,
+          hasError: true,
+          errorMsg: "Year must be after 1900",
+        };
+      }
+
+      return {
+        ...fieldObj,
+        hasError: false,
+        errorMsg: null,
+      };
     });
 
-    // If field errors found, return updated state obj & prevent further checks
-    if (formState.details.length > 0) {
-      formState = {
-        ...formState,
-        hasError: true,
-      };
+    // If any individual fields have errors, return the updated state list & stop further checks
+    if (formState.find((fieldObj) => fieldObj.hasError === true)) {
       return formState;
     }
 
-    // Check if provided input values make a valid date
-    // If invalid, return updated state obj & prevent further checks
+    // Don't allow to proceed if user's values don't make a valid date (ie. 31/4 when April has 30 days)
+    let userDate;
     try {
-      DateTime.fromObject({
-        year: birthday.year,
-        month: birthday.month,
-        day: birthday.day,
+      userDate = DateTime.fromObject({
+        year: formState.find((field) => field.field === "year").value,
+        month: formState.find((field) => field.field === "month").value,
+        day: formState.find((field) => field.field === "day").value,
       });
     } catch (error) {
-      formState = {
+      const predicate = (fieldObj) => fieldObj.field === "day";
+      return formState.toSpliced(formState.findIndex(predicate), 1, {
+        ...formState.find(predicate),
         hasError: true,
-        details: [
-          {
-            field: "day",
-            message: "Must be a valid date",
-          },
-        ],
-      };
-      return formState;
+        errorMsg: "Must be a valid date",
+      });
     }
 
-    // Check if provided date is in the past
-    // If invalid, return updated state obj & prevent further checks
-    const userDate = DateTime.fromObject({
-      year: birthday.year,
-      month: birthday.month,
-      day: birthday.day,
-    });
-
+    // Don't allow user's birthday to be in the future
     if (userDate > DateTime.now()) {
-      formState = {
+      const predicate = (fieldObj) => fieldObj.field === "year";
+      return formState.toSpliced(formState.findIndex(predicate), 1, {
+        ...formState.find(predicate),
         hasError: true,
-        details: [
-          {
-            fieldName: "year",
-            message: "Must be in the past",
-          },
-        ],
-      };
-      return formState;
+        errorMsg: "Must be in the past",
+      });
     }
 
-    // If no validation errors are flagged, return the initial valid state obj
+    // Since no errors are received at this point, return the clean birthday state list
     return formState;
   }
 
