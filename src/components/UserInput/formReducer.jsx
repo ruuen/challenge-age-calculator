@@ -33,7 +33,6 @@ export function formReducer(formState, action) {
   switch (action.type) {
     case ACTION.Update:
       return action.payload.formState;
-      return;
     case ACTION.UpdateField:
       const predicate = (field) => field.name === action.payload.field.name;
       return formState.toSpliced(formState.findIndex(predicate), 1, {
@@ -124,5 +123,7 @@ function validateFields(fields) {
         errorMsg: "Year must be after 1900",
       };
     }
+
+    return field;
   });
 }

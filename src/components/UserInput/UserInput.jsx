@@ -1,6 +1,6 @@
 import { useReducer, useState } from "react";
 import { DateTime } from "luxon";
-import submitIcon from "../media/icon-arrow.svg";
+import submitIcon from "../../media/icon-arrow.svg";
 import InputItem from "../InputItem/InputItem";
 import { formReducer, initialState } from "./FormReducer";
 
