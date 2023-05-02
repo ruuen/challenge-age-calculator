@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DateTime } from "luxon";
 import submitIcon from "../media/icon-arrow.svg";
+import InputItem from "./InputItem";
 
 export default function UserInput({ handleAgeChange }) {
   const [birthday, setBirthday] = useState({
@@ -14,13 +15,15 @@ export default function UserInput({ handleAgeChange }) {
     details: [],
   });
 
-  function handleChange(e) {
-    const { name, value } = e.target;
+  const inputElements = Object.keys(birthday).map((item, index) => {
+    return <InputItem key={index} name={item} value={birthday[item]} handleChange={handleChange} />;
+  });
 
+  function handleChange(e) {
     setBirthday((prevState) => {
       return {
         ...prevState,
-        [name]: value,
+        [e.target.name]: e.target.value,
       };
     });
   }
@@ -156,41 +159,7 @@ export default function UserInput({ handleAgeChange }) {
 
   return (
     <form className="inputs" onSubmit={handleSubmit}>
-      <div className="inputs__date-group">
-        <label htmlFor="day" className="inputs__input-label">
-          Day
-        </label>
-        <input
-          type="number"
-          name="day"
-          placeholder="DD"
-          className="inputs__input inputs__day"
-          value={birthday.day == null ? "" : birthday.day}
-          onChange={handleChange}
-        />
-        <label htmlFor="month" className="inputs__input-label">
-          Month
-        </label>
-        <input
-          type="number"
-          name="month"
-          placeholder="MM"
-          className="inputs__input inputs__month"
-          value={birthday.month == null ? "" : birthday.month}
-          onChange={handleChange}
-        />
-        <label htmlFor="year" className="inputs__input-label">
-          Year
-        </label>
-        <input
-          type="number"
-          name="year"
-          placeholder="YYYY"
-          className="inputs__input inputs__year"
-          value={birthday.year == null ? "" : birthday.year}
-          onChange={handleChange}
-        />
-      </div>
+      <div className="inputs__date-group">{inputElements}</div>
       <div className="inputs__btn-group">
         <button type="submit">
           <img src={submitIcon} alt="Arrow" />
