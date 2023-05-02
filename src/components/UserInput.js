@@ -25,28 +25,46 @@ export default function UserInput({ handleAgeChange }) {
     });
   }
 
-  function validateFormInputs() {
-    // Update the state to clear any old errors
-    setFormError({
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    // Validate birthday value inputs against specified rules
+    // Return a state object determing if form valid/invalid, and list of errors
+    const formState = validateFormInputs(birthday);
+
+    // If form valid, update the component form error state and call the age state update
+    if (!formState.hasError) {
+      setFormError(formState);
+      handleAgeChange(birthday);
+      return;
+    }
+
+    // If form invalid, update the component form error state
+    setFormError(formState);
+  }
+
+  function validateFormInputs(birthday) {
+    // Initialise an object with a valid form state
+    // This is modified/replaced throughout and gets returned on each logic path
+    let formState = {
       hasError: false,
       details: [],
-    });
+    };
 
-    const errors = [];
+    // Initialise an array of arrays containing each field name and value for comparison
     const fieldData = Object.entries(birthday);
 
-    // Individual field value checks
+    // Perform individual field value checks here
     fieldData.forEach((field) => {
       const fieldName = field[0];
       const value = field[1];
 
       // Check if field empty
-      if (value == "") {
-        errors.push({
+      if (value === "" || value === null) {
+        formState.details.push({
           field: fieldName,
           message: "This field is required",
         });
-
         return;
       }
 
@@ -54,7 +72,7 @@ export default function UserInput({ handleAgeChange }) {
       switch (fieldName) {
         case "day":
           if (value < 1 || value > 31) {
-            errors.push({
+            formState.details.push({
               field: fieldName,
               message: "Must be a valid day",
             });
@@ -62,106 +80,78 @@ export default function UserInput({ handleAgeChange }) {
           return;
         case "month":
           if (value < 1 || value > 12) {
-            errors.push({
+            formState.details.push({
               field: fieldName,
               message: "Must be a valid month",
             });
           }
           return;
         case "year":
-          if (value < 1900)
-            errors.push({
+          if (value < 1900) {
+            formState.details.push({
               field: fieldName,
               message: "Must be after 1900",
             });
+          }
           return;
         default:
           break;
       }
     });
 
+    // If field errors found, return updated state obj & prevent further checks
+    if (formState.details.length > 0) {
+      formState = {
+        ...formState,
+        hasError: true,
+      };
+      return formState;
+    }
+
     // Check if provided input values make a valid date
-    let date;
+    // If invalid, return updated state obj & prevent further checks
     try {
-      date = DateTime.fromObject({
+      DateTime.fromObject({
         year: birthday.year,
         month: birthday.month,
         day: birthday.day,
       });
     } catch (error) {
-      errors.splice(0, errors.length, {
-        field: "day",
-        message: "Must be a valid date",
-      });
-      return;
+      formState = {
+        hasError: true,
+        details: [
+          {
+            field: "day",
+            message: "Must be a valid date",
+          },
+        ],
+      };
+      return formState;
     }
 
-    // // Check if provided date is in the past
-    // if (date > DateTime.now()) {
-    //   errors.push({
-    //     fieldName: "year",
-    //     message: "Must be in the past",
-    //   });
-    //   return;
-    // }
-
-    // If there were any errors found, update the associated state
-    if (errors.length == 0) return;
-
-    setFormError({
-      hasError: true,
-      details: errors,
+    // Check if provided date is in the past
+    // If invalid, return updated state obj & prevent further checks
+    const userDate = DateTime.fromObject({
+      year: birthday.year,
+      month: birthday.month,
+      day: birthday.day,
     });
 
-    return;
-  }
+    if (userDate > DateTime.now()) {
+      formState = {
+        hasError: true,
+        details: [
+          {
+            fieldName: "year",
+            message: "Must be in the past",
+          },
+        ],
+      };
+      return formState;
+    }
 
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    validateFormInputs();
-
-    if (formError.hasError) return;
-
-    // TODO: add error handling functionality & remove alert placeholders
-    // if (birthday.day === "" || birthday.month === "" || birthday.year === "") {
-    //   alert("Field empty");
-    //   return;
-    // }
-
-    // if (birthday.day < 1 || birthday.day > 31) {
-    //   alert("Day out of range");
-    //   return;
-    // }
-
-    // if (birthday.month < 1 || birthday.month > 12) {
-    //   alert("Month out of range");
-    //   return;
-    // }
-
-    // if (birthday.year < 1900) {
-    //   alert("Year out of range");
-    //   return;
-    // }
-
-    // let date;
-    // try {
-    //   date = DateTime.fromObject({
-    //     year: birthday.year,
-    //     month: birthday.month,
-    //     day: birthday.day,
-    //   });
-    // } catch (error) {
-    //   alert("Invalid date");
-    //   return;
-    // }
-
-    // if (date > DateTime.now()) {
-    //   alert("Date in future");
-    //   return;
-    // }
-
-    handleAgeChange(birthday);
+    // If no validation errors are flagged, return the initial valid state obj
+    return formState;
   }
 
   return (
