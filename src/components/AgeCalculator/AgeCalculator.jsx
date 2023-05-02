@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DateTime, Settings } from "luxon";
-import DateDisplay from "./DateDisplay";
-import UserInput from "./UserInput";
+import DateDisplay from "../DateDisplay/DateDisplay";
+import UserInput from "../UserInput/UserInput";
 
 export default function AgeCalculator() {
   // Luxon setting to throw exceptions when a datetime is created as invalid
