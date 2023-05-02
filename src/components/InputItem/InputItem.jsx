@@ -1,5 +1,19 @@
-export default function InputItem({ name, value, errorStatus, errorMessage, handleChange }) {
+import { ACTION } from "../UserInput/FormReducer";
+
+export default function InputItem({ name, value, errorStatus, errorMessage, dispatch }) {
   const label = `${name.charAt(0).toUpperCase()}${name.substring(1)}`;
+
+  function handleChange(e) {
+    dispatch({
+      type: ACTION.UpdateField,
+      payload: {
+        field: {
+          name: e.target.name,
+          value: e.target.value,
+        },
+      },
+    });
+  }
 
   return (
     <div className="inputs__input-group">

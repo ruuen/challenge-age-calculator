@@ -1,165 +1,116 @@
-import { useReducer, useState } from "react";
-import { DateTime } from "luxon";
+import { useReducer } from "react";
+import { DateTime, Settings } from "luxon";
 import submitIcon from "../../media/icon-arrow.svg";
 import InputItem from "../InputItem/InputItem";
-import { formReducer, initialState } from "./FormReducer";
+import { ACTION, formReducer, initialState } from "./FormReducer";
 
 export default function UserInput({ handleAgeChange }) {
-  const [birthday, setBirthday] = useState([
-    {
-      field: "day",
-      value: null,
-      hasError: false,
-      errorMsg: null,
-    },
-    {
-      field: "month",
-      value: null,
-      hasError: false,
-      errorMsg: null,
-    },
-    {
-      field: "year",
-      value: null,
-      hasError: false,
-      errorMsg: null,
-    },
-  ]);
+  Settings.throwOnInvalid = true;
 
   const [formState, dispatch] = useReducer(formReducer, initialState);
 
-  const inputElements = birthday.map((field, index) => {
+  const inputElements = formState.map((field, index) => {
     return (
       <InputItem
         key={index}
-        name={field.field}
+        name={field.name}
         value={field.value}
         errorStatus={field.hasError}
         errorMessage={field.errorMsg}
-        handleChange={handleChange}
+        dispatch={dispatch}
       />
     );
   });
-
-  // TODO: Convert to reducer action
-  //    DONE
-  function handleChange(e) {
-    setBirthday((prevBirthdayFields) => {
-      const predicate = (fieldObj) => fieldObj.field === e.target.name;
-
-      return prevBirthdayFields.toSpliced(prevBirthdayFields.findIndex(predicate), 1, {
-        ...prevBirthdayFields.find(predicate),
-        value: e.target.value,
-      });
-    });
-  }
-
-  // TODO: Convert to reducer action
-  //    DONE
-  function handleClearError() {
-    setBirthday((prevBirthdayFields) => {
-      return prevBirthdayFields.map((fieldObj) => {
-        return {
-          ...fieldObj,
-          hasError: false,
-          errorMsg: null,
-        };
-      });
-    });
-  }
 
   function handleSubmit(e) {
     e.preventDefault();
 
     // Validate birthday value inputs against specified rules
-    // Return a new array of birthday fields, updated with any validation errors
-    const formState = validateFormInputs(birthday);
+    const newFormState = validateFormInputs(formState);
 
-    // If any field errors exist, update birthday field list state
-    if (formState.find((fieldObj) => fieldObj.hasError === true)) {
-      // TODO: Convert to reducer action
-      //    Done
-      setBirthday(formState);
+    if (newFormState.find((field) => field.hasError === true)) {
+      dispatch({
+        type: ACTION.UpdateForm,
+        payload: {
+          formState: newFormState,
+        },
+      });
       return;
     }
 
     // If no errors, pass birthdate into a date obj in the age calc fn call, then clear all input errors.
-    // TODO: When reducer swapped in, change these field.field refs to field.name
     handleAgeChange({
-      year: formState.find((field) => field.field === "year").value,
-      month: formState.find((field) => field.field === "month").value,
-      day: formState.find((field) => field.field === "day").value,
+      year: formState.find((field) => field.name === "year").value,
+      month: formState.find((field) => field.name === "month").value,
+      day: formState.find((field) => field.name === "day").value,
     });
-    // TODO: Call the reducer dispatch with type: ACTION.ClearFormError action instead
-    handleClearError();
+    dispatch({
+      type: ACTION.ClearFormError,
+    });
   }
 
-  // TODO: removed, moved to reducer action
-  function validateFormInputs(birthday) {
-    // Copy the passed field state array
-    let formState = Array.from(birthday);
-
+  function validateFormInputs(formData) {
     // Loop through the state array to perform field validations
-    formState = formState.map((fieldObj) => {
-      const { field, value } = fieldObj;
+    const validatedFields = formData.map((field) => {
+      const { name, value } = field;
 
       // Don't allow any null or empty value fields
       if (value === "" || value === null) {
         return {
-          ...fieldObj,
+          ...field,
           hasError: true,
           errorMsg: "This field is required",
         };
       }
 
-      if (field === "day" && (value < 1 || value > 31)) {
+      if (name === "day" && (value < 1 || value > 31)) {
         return {
-          ...fieldObj,
+          ...field,
           hasError: true,
           errorMsg: "Must be a valid day",
         };
       }
 
-      if (field === "month" && (value < 1 || value > 12)) {
+      if (name === "month" && (value < 1 || value > 12)) {
         return {
-          ...fieldObj,
+          ...field,
           hasError: true,
           errorMsg: "Must be a valid month",
         };
       }
 
-      if (field === "year" && value < 1900) {
+      if (name === "year" && value < 1900) {
         return {
-          ...fieldObj,
+          ...field,
           hasError: true,
           errorMsg: "Year must be after 1900",
         };
       }
 
       return {
-        ...fieldObj,
+        ...field,
         hasError: false,
         errorMsg: null,
       };
     });
 
     // If any individual fields have errors, return the updated state list & stop further checks
-    if (formState.find((fieldObj) => fieldObj.hasError === true)) {
-      return formState;
+    if (validatedFields.find((field) => field.hasError === true)) {
+      return validatedFields;
     }
 
     // Don't allow to proceed if user's values don't make a valid date (ie. 31/4 when April has 30 days)
     let userDate;
     try {
       userDate = DateTime.fromObject({
-        year: formState.find((field) => field.field === "year").value,
-        month: formState.find((field) => field.field === "month").value,
-        day: formState.find((field) => field.field === "day").value,
+        year: validatedFields.find((field) => field.name === "year").value,
+        month: validatedFields.find((field) => field.name === "month").value,
+        day: validatedFields.find((field) => field.name === "day").value,
       });
     } catch (error) {
-      const predicate = (fieldObj) => fieldObj.field === "day";
-      return formState.toSpliced(formState.findIndex(predicate), 1, {
-        ...formState.find(predicate),
+      const predicate = (field) => field.name === "day";
+      return validatedFields.toSpliced(validatedFields.findIndex(predicate), 1, {
+        ...validatedFields.find(predicate),
         hasError: true,
         errorMsg: "Must be a valid date",
       });
@@ -167,16 +118,16 @@ export default function UserInput({ handleAgeChange }) {
 
     // Don't allow user's birthday to be in the future
     if (userDate > DateTime.now()) {
-      const predicate = (fieldObj) => fieldObj.field === "year";
-      return formState.toSpliced(formState.findIndex(predicate), 1, {
-        ...formState.find(predicate),
+      const predicate = (field) => field.name === "year";
+      return validatedFields.toSpliced(validatedFields.findIndex(predicate), 1, {
+        ...validatedFields.find(predicate),
         hasError: true,
         errorMsg: "Must be in the past",
       });
     }
 
     // Since no errors are received at this point, return the clean birthday state list
-    return formState;
+    return validatedFields;
   }
 
   return (
