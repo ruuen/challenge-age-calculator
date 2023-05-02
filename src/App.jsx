@@ -1,4 +1,4 @@
-import AgeCalculator from "./components/AgeCalculator";
+import AgeCalculator from "./components/AgeCalculator/AgeCalculator";
 import "./App.scss";
 
 function App() {
