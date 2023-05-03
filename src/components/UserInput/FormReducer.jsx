@@ -31,10 +31,12 @@ export function formReducer(formState, action) {
       return action.payload.formState;
     case ACTION.UpdateField:
       const predicate = (field) => field.name === action.payload.field.name;
-      return formState.toSpliced(formState.findIndex(predicate), 1, {
-        ...formState.find(predicate),
+      const newFormState = Array.from(formState);
+      newFormState.splice(newFormState.findIndex(predicate), 1, {
+        ...newFormState.find(predicate),
         ...action.payload.field,
       });
+      return newFormState;
     case ACTION.ClearFormError:
       return formState.map((field) => {
         return {
