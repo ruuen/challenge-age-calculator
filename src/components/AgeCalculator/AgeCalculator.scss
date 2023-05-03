@@ -22,8 +22,12 @@
 
 @media (min-width: var.$breakpoint-desktop) {
   .age-calculator {
+    $normal-corner: 24px;
+    $clipped-corner: 200px;
+
     min-width: 53.5rem;
     min-height: 20rem;
+    border-radius: $normal-corner $normal-corner $clipped-corner $normal-corner;
     height: auto;
     width: auto;
     padding: 3.5em;
