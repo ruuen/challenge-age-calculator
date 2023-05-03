@@ -122,21 +122,25 @@ export default function UserInput({ handleAgeChange }) {
       });
     } catch (error) {
       const predicate = (field) => field.name === "day";
-      return validatedFields.toSpliced(validatedFields.findIndex(predicate), 1, {
-        ...validatedFields.find(predicate),
+      const newFormState = Array.from(validatedFields);
+      newFormState.splice(newFormState.findIndex(predicate), 1, {
+        ...newFormState.find(predicate),
         hasError: true,
         errorMsg: "Must be a valid date",
       });
+      return newFormState;
     }
 
     // Don't allow user's birthday to be in the future
     if (userDate > DateTime.now()) {
       const predicate = (field) => field.name === "year";
-      return validatedFields.toSpliced(validatedFields.findIndex(predicate), 1, {
-        ...validatedFields.find(predicate),
+      const newFormState = Array.from(validatedFields);
+      newFormState.splice(newFormState.findIndex(predicate), 1, {
+        ...newFormState.find(predicate),
         hasError: true,
         errorMsg: "Must be in the past",
       });
+      return newFormState;
     }
 
     // Since no errors are received at this point, return the clean birthday state list
