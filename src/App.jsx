@@ -4,8 +4,8 @@ import "./App.scss";
 function App() {
   return (
     <>
-      <h1 className="visually-hidden">Age Calculator</h1>
       <main className="page-container">
+        <h1 className="visually-hidden">Age Calculator</h1>
         <AgeCalculator />
       </main>
     </>
