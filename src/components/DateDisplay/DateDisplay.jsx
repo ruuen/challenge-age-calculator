@@ -1,3 +1,5 @@
+import "./DateDisplay.scss";
+
 export default function DateDisplay({ age }) {
   return (
     <div className="results">

@@ -3,6 +3,7 @@ import { DateTime, Settings } from "luxon";
 import submitIcon from "../../media/icon-arrow.svg";
 import InputItem from "../InputItem/InputItem";
 import { ACTION, formReducer, initialState } from "./FormReducer";
+import "./UserInput.scss";
 
 export default function UserInput({ handleAgeChange }) {
   Settings.throwOnInvalid = true;
@@ -63,7 +64,19 @@ export default function UserInput({ handleAgeChange }) {
         };
       }
 
-      if (name === "day" && (value < 1 || value > 31)) {
+      // Don't allow any character other than numerals
+      const regex = new RegExp("[^0-9]");
+      if (regex.test(value)) {
+        return {
+          ...field,
+          hasError: true,
+          errorMsg: "Must be a number",
+        };
+      }
+
+      const valueNum = parseInt(value);
+
+      if (name === "day" && (valueNum < 1 || valueNum > 31)) {
         return {
           ...field,
           hasError: true,
@@ -71,7 +84,7 @@ export default function UserInput({ handleAgeChange }) {
         };
       }
 
-      if (name === "month" && (value < 1 || value > 12)) {
+      if (name === "month" && (valueNum < 1 || valueNum > 12)) {
         return {
           ...field,
           hasError: true,
@@ -79,7 +92,7 @@ export default function UserInput({ handleAgeChange }) {
         };
       }
 
-      if (name === "year" && value < 1900) {
+      if (name === "year" && valueNum < 1900) {
         return {
           ...field,
           hasError: true,
@@ -109,21 +122,25 @@ export default function UserInput({ handleAgeChange }) {
       });
     } catch (error) {
       const predicate = (field) => field.name === "day";
-      return validatedFields.toSpliced(validatedFields.findIndex(predicate), 1, {
-        ...validatedFields.find(predicate),
+      const newFormState = Array.from(validatedFields);
+      newFormState.splice(newFormState.findIndex(predicate), 1, {
+        ...newFormState.find(predicate),
         hasError: true,
         errorMsg: "Must be a valid date",
       });
+      return newFormState;
     }
 
     // Don't allow user's birthday to be in the future
     if (userDate > DateTime.now()) {
       const predicate = (field) => field.name === "year";
-      return validatedFields.toSpliced(validatedFields.findIndex(predicate), 1, {
-        ...validatedFields.find(predicate),
+      const newFormState = Array.from(validatedFields);
+      newFormState.splice(newFormState.findIndex(predicate), 1, {
+        ...newFormState.find(predicate),
         hasError: true,
         errorMsg: "Must be in the past",
       });
+      return newFormState;
     }
 
     // Since no errors are received at this point, return the clean birthday state list
@@ -134,8 +151,9 @@ export default function UserInput({ handleAgeChange }) {
     <form className="inputs" onSubmit={handleSubmit}>
       <div className="inputs__date-group">{inputElements}</div>
       <div className="inputs__btn-group">
-        <button type="submit">
-          <img src={submitIcon} alt="Arrow" />
+        <div className="inputs__divider"></div>
+        <button className="inputs__btn" type="submit">
+          <img className="inputs__btn-icon" src={submitIcon} alt="Arrow" />
         </button>
       </div>
     </form>
