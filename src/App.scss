@@ -1,9 +1,16 @@
 @use "./scss/global";
-@use "./scss/variables";
+@use "./scss/variables" as var;
 @use "./scss/mediaqry";
 
 .page-container {
   display: flex;
   justify-content: center;
   padding: 5em 1em 3em 1em;
+}
+
+@media (min-width: var.$breakpoint-desktop) {
+  .page-container {
+    align-items: center;
+    padding: 0;
+  }
 }
