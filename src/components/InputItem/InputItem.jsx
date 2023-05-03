@@ -1,7 +1,16 @@
 import { ACTION } from "../UserInput/FormReducer";
+import "./InputItem.scss";
 
 export default function InputItem({ name, value, errorStatus, errorMessage, dispatch }) {
   const label = `${name.charAt(0).toUpperCase()}${name.substring(1)}`;
+  let placeholder;
+  if (name === "day") {
+    placeholder = "DD";
+  } else if (name === "month") {
+    placeholder = "MM";
+  } else if (name === "year") {
+    placeholder = "YYYY";
+  }
 
   function handleChange(e) {
     dispatch({
@@ -17,18 +26,19 @@ export default function InputItem({ name, value, errorStatus, errorMessage, disp
 
   return (
     <div className="inputs__input-group">
-      <label htmlFor={name} className="inputs__input-label">
+      <label htmlFor={name} className={`inputs__input-label ${errorStatus ? "inputs__input-label--error" : ""}`}>
         {label}
       </label>
       <input
-        type="number"
+        type="text"
+        inputMode="numeric"
         name={name}
-        placeholder="MM"
+        placeholder={placeholder}
         className={`inputs__input inputs__input-${name} ${errorStatus ? "inputs__input--error" : ""}`}
         value={value == null ? "" : value}
         onChange={handleChange}
       />
-      <span className="inputs__input-error">{errorMessage == null ? "" : errorMessage}</span>
+      <span className="inputs__input-message">{errorMessage == null ? "" : errorMessage}</span>
     </div>
   );
 }

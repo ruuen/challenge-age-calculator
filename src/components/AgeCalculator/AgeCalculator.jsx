@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DateTime } from "luxon";
 import DateDisplay from "../DateDisplay/DateDisplay";
 import UserInput from "../UserInput/UserInput";
+import "./AgeCalculator.scss";
 
 export default function AgeCalculator() {
   const [age, setAge] = useState({

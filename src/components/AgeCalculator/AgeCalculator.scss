@@ -1,0 +1,12 @@
+@use "../../scss/variables.scss" as var;
+
+.age-calculator {
+  $normal-corner: 24px;
+  $clipped-corner: 100px;
+
+  background-color: var.$clr-white;
+  width: 100%;
+  height: fit-content;
+  padding: 3.5em 1em;
+  border-radius: $normal-corner $normal-corner $clipped-corner $normal-corner;
+}

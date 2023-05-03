@@ -1,0 +1,53 @@
+@use "../../scss/variables.scss" as var;
+
+.inputs__input-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.inputs__input {
+  $input-corners: 8px;
+
+  border: 1px solid var.$clr-grey-light;
+  border-radius: $input-corners;
+  padding: 0.5em;
+  font-family: var.$font-family;
+  font-weight: var.$font-weight-semibold;
+  font-size: 1.25rem;
+  color: var.$clr-black;
+  width: 100%;
+
+  &:hover {
+    border: 1px solid var.$clr-purple;
+  }
+
+  &::placeholder {
+    color: var.$clr-black;
+    opacity: 0.5;
+  }
+
+  &-label {
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var.$clr-grey;
+    font-size: 0.75rem;
+    padding: 0 0 0.25em 0;
+
+    &--error {
+      color: var.$clr-red;
+    }
+  }
+
+  &-message {
+    font-size: 0.75rem;
+    font-weight: var.$font-weight-normal;
+    font-style: italic;
+    color: var.$clr-red;
+    padding: 0.5em 0.25em 0 0;
+  }
+
+  &--error {
+    border: 1px solid var.$clr-red;
+  }
+}

@@ -1,0 +1,53 @@
+@use "../../scss/variables.scss" as var;
+
+.inputs {
+  width: 100%;
+}
+
+.inputs__btn-group {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  padding: 2em 0;
+}
+
+.inputs__date-group {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 0.33fr);
+  grid-gap: 1em;
+}
+
+.inputs__divider {
+  // This might need some work to scale correctly,
+  // but otherwise I can turn it into a global var to be used in mediaqry
+  $height: 0.065em;
+
+  position: absolute;
+  width: 100%;
+  height: $height;
+  background: var.$clr-grey-light;
+  left: 0;
+  top: calc(50% - ($height / 2));
+  z-index: 5;
+  user-select: none;
+}
+
+.inputs__btn {
+  position: relative;
+  z-index: 10;
+  border: 0;
+  border-radius: 50%;
+  height: 100%;
+  aspect-ratio: 1/1;
+  background: var.$clr-purple;
+  cursor: pointer;
+
+  &:hover {
+    background: var.$clr-black;
+  }
+
+  &-icon {
+    width: 50%;
+  }
+}
