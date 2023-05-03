@@ -32,6 +32,7 @@ export default function InputItem({ name, value, errorStatus, errorMessage, disp
       <input
         type="text"
         inputMode="numeric"
+        id={name}
         name={name}
         placeholder={placeholder}
         className={`inputs__input inputs__input-${name} ${errorStatus ? "inputs__input--error" : ""}`}

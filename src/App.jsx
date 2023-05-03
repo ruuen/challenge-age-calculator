@@ -3,9 +3,12 @@ import "./App.scss";
 
 function App() {
   return (
-    <main className="page-container">
-      <AgeCalculator />
-    </main>
+    <>
+      <h1 className="visually-hidden">Age Calculator</h1>
+      <main className="page-container">
+        <AgeCalculator />
+      </main>
+    </>
   );
 }
 
