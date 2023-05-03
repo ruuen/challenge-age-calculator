@@ -19,6 +19,13 @@
   padding: 0 0 0 0.175em;
 }
 
+@media (min-width: var.$breakpoint-tablet) {
+  .results__item {
+    font-size: clamp(2.5rem, 7vh, 10rem);
+    line-height: clamp(1.5ch, 1vh, 100ch);
+  }
+}
+
 @media (min-width: var.$breakpoint-desktop) {
   .results__item {
     font-size: 6.5rem;
