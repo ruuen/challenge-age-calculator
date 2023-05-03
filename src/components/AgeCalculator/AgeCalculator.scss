@@ -10,3 +10,11 @@
   padding: 3.5em 1em;
   border-radius: $normal-corner $normal-corner $clipped-corner $normal-corner;
 }
+
+@media (min-width: var.$breakpoint-desktop) {
+  .age-calculator {
+    max-width: 52.5rem;
+    min-height: 20rem;
+    padding: 3.5em;
+  }
+}

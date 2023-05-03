@@ -51,3 +51,16 @@
     width: 50%;
   }
 }
+
+@media (min-width: var.$breakpoint-desktop) {
+  .inputs__btn-group {
+    padding: 0;
+    height: 6rem;
+    justify-content: flex-end;
+  }
+
+  .inputs__date-group {
+    max-width: 34rem;
+    grid-gap: 2em;
+  }
+}

@@ -18,3 +18,18 @@
 .results__field {
   padding: 0 0 0 0.175em;
 }
+
+@media (min-width: var.$breakpoint-desktop) {
+  .results__item {
+    font-size: 6.5rem;
+    line-height: 7rem;
+  }
+
+  .results__user {
+    letter-spacing: 0.125em;
+  }
+
+  .results__field {
+    padding: 0 0 0 0.05em;
+  }
+}
