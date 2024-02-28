@@ -44,7 +44,7 @@ Users should be able to:
 ### Links
 
 - Solution URL: [Frontend Mentor](https://www.frontendmentor.io/solutions/age-calculator-app-with-react-and-scss-0EEQWk_t45)
-- Live Site URL: [Netlify](https://rd-challenge-age-calculator.netlify.app/)
+- Live Site URL: [Cloudflare Pages](https://mbr-challenge-age-calculator.pages.dev/)
 
 ## My process
 
@@ -83,5 +83,5 @@ I need to return and complete the bonus challenge item of animating the age resu
 
 ## Author
 
-- Frontend Mentor - [@ruuendigital](https://www.frontendmentor.io/profile/ruuendigital)
+- Frontend Mentor - [@ruuen](https://www.frontendmentor.io/profile/ruuen)
 - Twitter - [@maxruuen](https://www.twitter.com/maxruuen)
